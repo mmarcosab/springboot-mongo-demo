@@ -4,6 +4,7 @@ services:
 
   mongo:
     image: mongo
+    container_name: mongo
     ports:
       - "27017:27017"
     restart: always
@@ -12,6 +13,36 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     networks:
       - mongo-compose-network
+
+  prometheus:
+    image: prom/prometheus:v2.30.3
+    ports:
+      - 9000:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yaml
+    container_name: prometheus
+    restart: unless-stopped
+    depends_on:
+      - mongo
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    volumes:
+      - ./grafana:/var/lib/grafana
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SERVER_DOMAIN=localhost
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus_data:
 
 networks:
   mongo-compose-network:
