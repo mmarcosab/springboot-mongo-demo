@@ -4,14 +4,12 @@ import com.example.demo.adapters.database.document.RiceProductionData;
 import com.example.demo.adapters.database.repository.SpringDataRiceProductionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -116,11 +114,8 @@ public class RiceProductionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable final String id) {
-        final var response = springDataRiceProductionRepository.findById(id);
-        if(response.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(response.get());
+        final var response = springDataRiceProductionRepository.findById(id).orElseThrow();
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
